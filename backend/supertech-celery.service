@@ -1,0 +1,23 @@
+[Unit]
+Description=SuperTech Celery Worker
+After=network.target
+
+[Service]
+Type=forking
+User=www-data
+WorkingDirectory=/var/www/supertech/backend
+
+Environment="PATH=/var/www/supertech/backend/venv/bin"
+Environment="DJANGO_SETTINGS_MODULE=supertech_backend.settings"
+Environment="ENVIRONMENT=production"
+
+ExecStart=/var/www/supertech/backend/venv/bin/celery -A supertech_backend worker \
+    --loglevel=info \
+    --logfile=/var/log/supertech/celery.log \
+    --pidfile=/var/run/celery.pid
+
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,22 @@
+[Unit]
+Description=SuperTech Celery Beat
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/supertech/backend
+
+Environment="PATH=/var/www/supertech/backend/venv/bin"
+Environment="DJANGO_SETTINGS_MODULE=supertech_backend.settings"
+Environment="ENVIRONMENT=production"
+
+ExecStart=/var/www/supertech/backend/venv/bin/celery -A supertech_backend beat \
+    --loglevel=info \
+    --logfile=/var/log/supertech/celery-beat.log
+
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
