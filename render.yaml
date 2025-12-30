@@ -1,0 +1,43 @@
+# Render.com Build and Deployment Configuration
+# Place this file in your repository root as 'render.yaml' or configure in Render dashboard
+
+services:
+  - type: web
+    name: supertech-backend
+    runtime: python
+    pythonVersion: 3.13
+    plan: starter
+    
+    # Build command
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      cd backend && python manage.py collectstatic --noinput && cd ..
+    
+    # Start command - Updated to use the wsgi_render.py entry point
+    startCommand: gunicorn wsgi_render:app --bind 0.0.0.0:10000 --workers 4
+    
+    # Environment variables (set these in Render dashboard)
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: False
+      - key: DJANGO_SETTINGS_MODULE
+        value: supertech_backend.settings
+      - key: PYTHONUNBUFFERED
+        value: true
+      # Note: Set SECRET_KEY, DB credentials, API keys in Render dashboard
+    
+    # Database
+    databases:
+      - name: supertech-db
+        databaseName: supertech_db
+        user: supertech_user
+        plan: starter
+    
+    # Health check
+    healthCheckPath: /admin/
+    
+    # Auto-deploy on push
+    autoDeploy: true
